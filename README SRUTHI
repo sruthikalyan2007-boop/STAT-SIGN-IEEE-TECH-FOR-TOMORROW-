@@ -1,0 +1,53 @@
+Here is a summary of what has been accomplished so far on your project:
+
+1. Environment & Dependencies (Step 1 Completed)
+Python Environment: Running Python 3.13 on your machine.
+Libraries Installed & Verified:
+datasets (Hugging Face)
+pandas, numpy, scikit-learn
+tensorflow (v2.21.0) & keras (v3.15.1)
+opencv-python
+mediapipe (Holistic tracking)
+Resolved Dependency Conflict: Fixed a version mismatch between TensorFlow 2.21 and Protobuf (upgraded to Protobuf 7.36.2), ensuring all ML and computer vision libraries import and run smoothly without warnings or crashes.
+Workspace Setup: All scripts and outputs are configured directly in your project folder at 
+
+C:\SIGN_DEMO
+.
+2. Dataset Analysis & Why the Process Paused Earlier
+Remote Dataset Structure:
+We inspected Hugging Face RunningPie/CLARIS_sampledataset. The underlying dataset file claris_curated_dataset.csv is 5.77 GB.
+The dataset is stored in long format (1 row per landmark). A single frame has 543 landmarks (Face: 468, Pose: 33, Left Hand: 21, Right Hand: 21).
+A single sign sequence spans 10,000 to 15,000 rows.
+The file is sorted alphabetically by sign (arm is first, with police at ~3.5 GB and sick at ~4.2 GB).
+Root Cause of the Initial Pause:
+When streaming row-by-row sequentially through 5.77 GB over standard HTTP in Python, reaching all signs would require iterating through tens of millions of rows, which takes hours and triggered network timeouts.
+Storage Constraint Compliance:
+Local dataset disk usage right now is 0 MB (strict adherence to your < 200MB limit). Full dataset files were never downloaded to disk.
+3. Emergency Signs Selected (Exact Vocabulary Match)
+By inspecting 
+
+vocabulary.txt
+ directly from the dataset repository, we verified the available 60-word vocabulary and selected the 10 most relevant to medical, safety, and physical emergencies:
+
+#	Selected Sign	Emergency Context
+1	police	Law enforcement / safety emergency
+2	fireman	Fire / rescue services
+3	sick	Medical condition / illness
+4	owie	ASL term for pain / hurt / injury
+5	cut	Physical bleeding / laceration / wound
+6	fall	Slip and fall / physical collapse
+7	cry	Severe distress / trauma
+8	stuck	Entrapment / danger
+9	bad	Acute distress / condition worsening
+10	arm	Physical trauma / limb injury / fracture
+4. Next Step Ready to Execute (Step 2 & Step 3 Checkpoint)
+To extract the sequences without streaming millions of rows linearly:
+
+Target the sequences for these 10 signs directly.
+Materialize only this filtered subset into 
+
+C:\SIGN_DEMO\filtered_dataset.csv
+ (~15 MB, well below your 200MB limit).
+Reshape and pad/truncate each sequence to 30 frames × 1,629 features (543 landmarks × 3 coordinates).
+Pause and report the final data shapes, exact disk space used, and wait for your confirmation before training the model (Step 4).
+Shall I proceed with materializing the filtered dataset and reshaping the sequences?
